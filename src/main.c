@@ -4,4 +4,5 @@
 
 int main(int argc, char *argv[]) {
 	lex("example.json");
+	return 0;
 }
