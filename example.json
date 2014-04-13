@@ -1,5 +1,13 @@
 {
 	"name": "Il était une fois",
 	"author": "Pierre",
-	"version": "0.0.1"
+	"version": "0.0.1",
+	"elements": [
+		{
+			"name": "pages"
+		},
+		{
+			"name": "posts"
+		}
+	]
 }
