@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <string.h>
+#include "lexer.h"
 
 void lex(char path[]) {
 	printf("reading %s\n", path);
