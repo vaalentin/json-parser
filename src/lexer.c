@@ -15,6 +15,8 @@ void lex(char path[]) {
 
 		printf("File found \n");
 
+		int currentLine = 0, currentCol = 0;
+		int start = 0; // to tempor
 		char buffer[100] = "";
 		bool quotationOpen = false;
 
@@ -24,10 +26,16 @@ void lex(char path[]) {
 			currentChar = fgetc(file);
 
 			// match the current character
-			if(currentChar == '{') {
+			if(currentChar == '\n') {
+				currentLine++;
+				currentCol = 0;
+			}
+			else if(currentChar == '{') {
+				printf("(line %d) (col %d) | ", currentLine, currentCol);
 				printf("LEFT_BRACKET\n");
 			}
 			else if(currentChar == '}') {
+				printf("(line %d) (col %d) | ", currentLine, currentCol);
 				printf("RIGHT_BRACKET\n");
 			}
 			else if(currentChar == '"') {
@@ -37,20 +45,29 @@ void lex(char path[]) {
 				// if we just found a closing "
 				// get the buffer value and reset it
 				if(!quotationOpen) {
+					printf("(line %d) (start col %d) (end col %d) | ", currentLine, start, currentCol - 1);
 					printf("%s\n", buffer);
 					buffer[0] = '\0';
+				} else {
+					start = currentCol + 1;
 				}
+				printf("(line %d) (col %d) | ", currentLine, currentCol);
+				printf("QUOTE\n");
 			}
 			else if(currentChar == '[') {
+				printf("(line %d) (col %d) | ", currentLine, currentCol);
 				printf("LEFT_SQUARE\n");
 			}
 			else if(currentChar == ']') {
+				printf("(line %d) (col %d) | ", currentLine, currentCol);
 				printf("RIGHT_SQUARE\n");
 			}
 			else if(currentChar == ':') {
+				printf("(line %d) (col %d) | ", currentLine, currentCol);
 				printf("ASSIGNATION\n");
 			}
 			else if(currentChar == ',') {
+				printf("(line %d) (col %d) | ", currentLine, currentCol);
 				printf("COMMA\n");
 			}
 			else {
@@ -61,6 +78,8 @@ void lex(char path[]) {
 				    buffer[length+1] ='\0';
 				}
 			}
+
+			currentCol++;
 			
 		} while (currentChar != EOF);
 
