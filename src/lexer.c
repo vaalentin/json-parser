@@ -1,6 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <stdbool.h>
+#include <string.h>
+
+void append(char text1[], char text2[]) {
+	size_t len1 = strlen(text1);
+	size_t len2 = strlen(text2);
+
+	char *concat = (char*) malloc(len1 + len2 + 1);
+
+	memcpy(concat, text1, len1);
+	memcpy(concat + len1, text2, len2+1);
+
+	strcpy(text1, concat);
+}
 
 void lex(char path[]) {
 	printf("reading %s\n", path);
@@ -13,47 +27,39 @@ void lex(char path[]) {
 
 		printf("File found \n");
 
+		char tmp[] = " ";
+		char buffer[] = "";
+		bool quotationOpen = false;
+
 		do {
 
 			currentChar = fgetc(file);
 
-			char buffer[] = "";
-
-			switch(currentChar) {
-				case '{':
-					printf(" LEFT_BRACKET ");
-					break;
-
-				case '}':
-					printf(" RIGHT_BRACKET ");
-					break;
-
-				case '"':
-					printf(" QUOTATION ");
-					break;
-
-				case '[':
-					printf(" LEFT_SQUARE ");
-					break;
-
-				case ']':
-					printf(" RIGHT_SQUARE ");
-					break;
-
-				case ':':
-					printf(" EQUALS ");
-					break;
-
-				case ',':
-					printf(" COMMA ");
-					break;
-
-				default:
-					printf("%c", currentChar);
-					break;
+			if(currentChar == '{') {
+				printf(" LEFT_BRACKET ");
 			}
-			
-			//printf("%c\n", currentChar);
+			else if(currentChar == '}') {
+				printf(" RIGHT_BRACKET ");
+			}
+			else if(currentChar == '"') {
+				printf(" QUOTATION ");
+			}
+			else if(currentChar == '[') {
+				printf(" LEFT_SQUARE ");
+			}
+			else if(currentChar == ']') {
+				printf(" RIGHT_SQUARE ");
+			}
+			else if(currentChar == ':') {
+				printf(" ASSIGNATION ");
+			}
+			else if(currentChar == ',') {
+				printf(" COMMA ");
+			}
+			else {
+				tmp[0] = currentChar;
+				printf("%s", tmp);
+			}
 			
 		} while (currentChar != EOF);
 
