@@ -11,6 +11,15 @@
 #include "lexer.h"
 #include "Buffer.h"
 
+
+void appendToken(char type[], char value[], int line, int start, int end) {
+	if(value != NULL) {
+		printf("%d | %d-%d | %s => %s\n", line, start, end, type, value);
+	} else {
+		printf("%d | %d-%d | %s\n", line, start, end, type);
+	}
+}
+
 void lex(char path[]) {
 
 	printf("reading %s\n", path);
@@ -51,20 +60,16 @@ void lex(char path[]) {
 				currentCol = 0;
 			}
 			else if(currentChar == '{') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("LEFT_BRACKET\n");
+				appendToken("LEFT_BRACKET", NULL, currentLine, currentCol, currentCol);
 			}
 			else if(currentChar == '}') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("RIGHT_BRACKET\n");
+				appendToken("RIGHT_BRACKET", NULL, currentLine, currentCol, currentCol);
 			}
 			else if(currentChar == '[') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("LEFT_SQUARE\n");
+				appendToken("LEFT_SQUARE", NULL, currentLine, currentCol, currentCol);
 			}
 			else if(currentChar == ']') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("RIGHT_SQUARE\n");
+				appendToken("RIGHT_SQUARE", NULL, currentLine, currentCol, currentCol);
 			}
 			else if(currentChar == '"') {
 				// start the buffering
@@ -72,8 +77,6 @@ void lex(char path[]) {
 				// we just found a closing "
 				if(!quotationOpen) {
 
-					printf("%d | %d-%d | ", currentLine, start, currentCol - 1);
-					
 					// capture the buffer content
 					// add 1 to have enough space to put '\0'
 					char text[buffer.used + 1];
@@ -81,7 +84,9 @@ void lex(char path[]) {
 						text[i] = buffer.array[i];
 						text[i + 1] = '\0';
 					}
-					printf("%s\n", text);
+
+					appendToken("VALUE", text, currentLine, start, currentCol);
+
 					// empty the buffer
 					emptyBuffer(&buffer);
 
@@ -90,16 +95,13 @@ void lex(char path[]) {
 					start = currentCol + 1;
 				}
 
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("QUOTE\n");
+				appendToken("QUOTE", NULL, currentLine, currentCol, currentCol);
 			}
 			else if(currentChar == ':') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("ASSIGNATION\n");
+				appendToken("ASSIGNATION", NULL, currentLine, currentCol, currentCol);
 			}
 			else if(currentChar == ',') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("COMMA\n");
+				appendToken("COMA", NULL, currentLine, currentCol, currentCol);
 			}
 			else {
 				// not a reserved character, append it to the buffer
