@@ -1,13 +1,9 @@
 {
-	"name": "Il était une fois",
-	"author": "Pierre",
+	"name": "Once upon a time",
+	"author": "Henry",
 	"version": "0.0.1",
 	"elements": [
-		{
-			"name": "pages"
-		},
-		{
-			"name": "posts"
-		}
+		{ "name": "cover" },
+		{ "name": "pages" }
 	]
 }
