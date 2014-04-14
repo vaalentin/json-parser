@@ -1,0 +1,9 @@
+{
+	"name": "Once upon a time",
+	"author": "Henry",
+	"version": "0.0.1",
+	"elements": [
+		{ "name": "cover" },
+		{ "name": "pages" }
+	]
+}
