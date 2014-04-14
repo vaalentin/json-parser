@@ -19,4 +19,6 @@ void clearTokenlist(Tokenlist *list);
 
 void printTokenlist(Tokenlist *list);
 
+int getTokenlistSize(Tokenlist *list);
+
 #endif

@@ -42,7 +42,7 @@ void lex(char path[]) {
 
 		// our tokenlist (object returned)
 		Tokenlist tokens;
-		initTokenlist(&tokens, 1);
+		initTokenlist(&tokens, 100);
 		
 		// our buffer
 		Buffer buffer;
@@ -70,22 +70,22 @@ void lex(char path[]) {
 					break;
 
 				case '[':
-					
+					processToken(&tokens, "LEFT_SQUARE");
 					printToken("LEFT_SQUARE", NULL, currentLine, currentCol, currentCol);
 					break;
 
 				case ']':
-					
+					processToken(&tokens, "RIGHT_SQUARE");
 					printToken("RIGHT_SQUARE", NULL, currentLine, currentCol, currentCol);
 					break;
 
 				case ':':
-					
+					processToken(&tokens, "ASSIGNATION");
 					printToken("ASSIGNATION", NULL, currentLine, currentCol, currentCol);
 					break;
 
 				case ',':
-
+					processToken(&tokens, "COMA");
 					printToken("COMA", NULL, currentLine, currentCol, currentCol);
 					break;
 
@@ -99,10 +99,12 @@ void lex(char path[]) {
 							text[i + 1] = '\0';
 						}
 						emptyBuffer(&buffer); // empty the buffer
+						processToken(&tokens, "VALUE");
 						printToken("VALUE", text, currentLine, start, currentCol);
 					} else {
 						start = currentCol + 1; // otherwise, a word to capture started
 					}
+					processToken(&tokens, "QUOTE");
 					printToken("QUOTE", NULL, currentLine, currentCol, currentCol);
 					break;
 
@@ -121,7 +123,8 @@ void lex(char path[]) {
 		fclose(file);
 
 		// dump the Tokenlist
-		printTokenlist(&tokens);
+		int size = getTokenlistSize(&tokens);
+		printf("\n%d TOKENS FOUND\n", size);
 
 	} else {
 		printf("File not found \n");
