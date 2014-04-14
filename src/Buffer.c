@@ -22,6 +22,13 @@ void emptyBuffer(Buffer *buffer) {
 	buffer->size = 0;
 }
 
+void clearBuffer(Buffer *buffer) {
+	free(buffer->array);
+	buffer->array = NULL;
+	buffer->used = 0;
+	buffer->size = 0;
+}
+
 void printBuffer(Buffer *buffer) {
 	for(int i = 0; i < buffer->used; i++) {
 		printf("%c", buffer->array[i]);
