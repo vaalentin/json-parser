@@ -2,7 +2,7 @@
 #define H_TOKEN
 
 typedef struct Token {
-	int line, start, end;
+	char *type;
 } Token;
 
 void printToken(char type[], char value[], int line, int start, int end);

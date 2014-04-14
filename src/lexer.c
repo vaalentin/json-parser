@@ -8,23 +8,17 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <string.h>
+
 #include "lexer.h"
 #include "Buffer.h"
+#include "Tokenlist.h"
+#include "Token.h"
 
-#define ANSI_COLOR_RED "\x1b[31m"
-#define ANSI_COLOR_GREEN "\x1b[32m"
-#define ANSI_COLOR_YELLOW "\x1b[33m"
-#define ANSI_COLOR_BLUE "\x1b[34m"
-#define ANSI_COLOR_MAGENTA "\x1b[35m"
-#define ANSI_COLOR_CYAN "\x1b[36m"
-#define ANSI_COLOR_RESET "\x1b[0m"
+void processToken(Tokenlist *list, char type[]) {
+	Token tok;
+	tok.type = type;
 
-void appendToken(char type[], char value[], int line, int start, int end) {
-	if(value != NULL) {
-		printf("%d | " ANSI_COLOR_MAGENTA "%d-%d" ANSI_COLOR_RESET " | " ANSI_COLOR_BLUE "%s" ANSI_COLOR_RESET " => " ANSI_COLOR_GREEN "%s\n" ANSI_COLOR_RESET, line, start, end, type, value);
-	} else {
-		printf("%d | " ANSI_COLOR_MAGENTA "%d-%d" ANSI_COLOR_RESET " | " ANSI_COLOR_BLUE "%s\n" ANSI_COLOR_RESET, line, start, end, type);
-	}
+	appendTokenlist(list, tok);
 }
 
 void lex(char path[]) {
@@ -45,6 +39,10 @@ void lex(char path[]) {
 		 */
 		int currentChar = 0, currentLine = 0, currentCol = 0, start = 0;
 		bool quotationOpen = false;
+
+		// our tokenlist (object returned)
+		Tokenlist tokens;
+		initTokenlist(&tokens, 1);
 		
 		// our buffer
 		Buffer buffer;
@@ -60,24 +58,37 @@ void lex(char path[]) {
 					currentLine++;
 					currentCol = 0;
 					break;
+
 				case '{':
-					appendToken("LEFT_BRACKET", NULL, currentLine, currentCol, currentCol);
+					processToken(&tokens, "LEFT_BRACKET");
+					printToken("LEFT_BRACKET", NULL, currentLine, currentCol, currentCol);
 					break;
+
 				case '}':
-					appendToken("RIGHT_BRACKET", NULL, currentLine, currentCol, currentCol);
+					processToken(&tokens, "RIGHT_BRACKET");
+					printToken("RIGHT_BRACKET", NULL, currentLine, currentCol, currentCol);
 					break;
+
 				case '[':
-					appendToken("LEFT_SQUARE", NULL, currentLine, currentCol, currentCol);
+					
+					printToken("LEFT_SQUARE", NULL, currentLine, currentCol, currentCol);
 					break;
+
 				case ']':
-					appendToken("RIGHT_SQUARE", NULL, currentLine, currentCol, currentCol);
+					
+					printToken("RIGHT_SQUARE", NULL, currentLine, currentCol, currentCol);
 					break;
+
 				case ':':
-					appendToken("ASSIGNATION", NULL, currentLine, currentCol, currentCol);
+					
+					printToken("ASSIGNATION", NULL, currentLine, currentCol, currentCol);
 					break;
+
 				case ',':
-					appendToken("COMA", NULL, currentLine, currentCol, currentCol);
+
+					printToken("COMA", NULL, currentLine, currentCol, currentCol);
 					break;
+
 				case '"':
 					quotationOpen = !quotationOpen; // start the buffering
 					if(!quotationOpen) { // finish the buffering
@@ -88,12 +99,13 @@ void lex(char path[]) {
 							text[i + 1] = '\0';
 						}
 						emptyBuffer(&buffer); // empty the buffer
-						appendToken("VALUE", text, currentLine, start, currentCol);
+						printToken("VALUE", text, currentLine, start, currentCol);
 					} else {
 						start = currentCol + 1; // otherwise, a word to capture started
 					}
-					appendToken("QUOTE", NULL, currentLine, currentCol, currentCol);
+					printToken("QUOTE", NULL, currentLine, currentCol, currentCol);
 					break;
+
 				default:
 					// not a reserved character, append it to the buffer
 					if(quotationOpen) {
@@ -107,6 +119,9 @@ void lex(char path[]) {
 		} while (currentChar != EOF);
 
 		fclose(file);
+
+		// dump the Tokenlist
+		printTokenlist(&tokens);
 
 	} else {
 		printf("File not found \n");
