@@ -9,15 +9,29 @@ void initArray(Array *array, size_t size) {
 }
 
 void appendArray(Array *array, int element) {
+	if(array->used == array->size) {
+		array->size *= 2;
+		array->array = (int *)realloc(array->array, array->size * sizeof(int));
+	}
+	array->array[array->used++] = element;
+}
 
+void emptyArray(Array *array) {
+	//array->array[0] = '\0';
+	array->array = (int *)realloc(array->array, 1 * sizeof(int));
+	array->used = 0;
+	array->size = 1;
 }
 
 void clearArray(Array *array) {
-
+	free(array->array);
+	array->array = NULL;
+	array->used = 0;
+	array->size = 0;
 }
 
 void printArray(Array *array) {
-	for(int i = 0; i < array->size; i++) {
+	for(int i = 0; i < array->used; i++) {
 		printf("%d\n", array->array[i]);
 	}
 }

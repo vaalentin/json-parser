@@ -11,6 +11,8 @@ void initArray(Array *array, size_t size);
 
 void appendArray(Array *array, int element);
 
+void emptyArray(Array *array);
+
 void clearArray(Array *array);
 
 void printArray(Array *array);
