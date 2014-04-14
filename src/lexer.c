@@ -10,6 +10,7 @@
 #include <string.h>
 #include "lexer.h"
 #include "Buffer.h"
+#include "Token.h"
 
 void lex(char path[]) {
 
@@ -26,9 +27,11 @@ void lex(char path[]) {
 		 * currentLine holds the current line number
 		 * currentCol holds the current column number
 		 * start tmp value to hold the start of a catcheable sequence
+		 * *currentTag
 		 */
 		int currentChar = 0, currentLine = 0, currentCol = 0, start = 0;
-		bool quotationOpen = false;
+		bool quotationOpen = false, matched = false;
+		char *currentType, *currentValue;
 		
 		// our buffer
 		Buffer buffer;
@@ -38,6 +41,9 @@ void lex(char path[]) {
 		do {
 
 			currentChar = fgetc(file);
+
+			// reset the currentType;
+			currentType = "";
 
 			/**
 			 * match the current character
@@ -51,29 +57,22 @@ void lex(char path[]) {
 				currentCol = 0;
 			}
 			else if(currentChar == '{') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("LEFT_BRACKET\n");
+				currentType = "LEFT_BRACKET";
 			}
 			else if(currentChar == '}') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("RIGHT_BRACKET\n");
+				currentType = "RIGHT_BRACKET";
 			}
 			else if(currentChar == '[') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("LEFT_SQUARE\n");
+				currentType = "LEFT_SQUARE";
 			}
 			else if(currentChar == ']') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("RIGHT_SQUARE\n");
+				currentType = "RIGHT_SQUARE";
 			}
 			else if(currentChar == '"') {
 				// start the buffering
 				quotationOpen = !quotationOpen;
 				// we just found a closing "
 				if(!quotationOpen) {
-
-					printf("%d | %d-%d | ", currentLine, start, currentCol - 1);
-					
 					// capture the buffer content
 					// add 1 to have enough space to put '\0'
 					char text[buffer.used + 1];
@@ -81,7 +80,8 @@ void lex(char path[]) {
 						text[i] = buffer.array[i];
 						text[i + 1] = '\0';
 					}
-					printf("%s\n", text);
+					currentType = "EXPRESSION";
+					currentValue = text;
 					// empty the buffer
 					emptyBuffer(&buffer);
 
@@ -90,22 +90,33 @@ void lex(char path[]) {
 					start = currentCol + 1;
 				}
 
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("QUOTE\n");
+				//printf("%d | %d | ", currentLine, currentCol);
+				//printf("QUOTE\n");
 			}
 			else if(currentChar == ':') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("ASSIGNATION\n");
+				currentType = "ASSIGNATION";
 			}
 			else if(currentChar == ',') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("COMMA\n");
+				currentType = "COMMA";
 			}
 			else {
 				// not a reserved character, append it to the buffer
 				if(quotationOpen) {
 					appendBuffer(&buffer, currentChar);
 				}
+			}
+
+			// process the token
+			// check if the string pointed by currentType is different than ""
+			if(strcmp(currentType, "") != 0) {
+				Token token;
+				token.type = currentType;
+				token.value = currentValue;
+				token.line = currentLine;
+				token.start = start;
+				token.end = currentCol;
+
+				printToken(&token);
 			}
 
 			currentCol++;
