@@ -3,8 +3,8 @@
 #ifndef H_LEXER
 #define H_LEXER
 
-void processToken(Tokenlist *list, char type[], char value[]);
+void processToken(Tokenlist *list, char type[], char value[], int line, int start, int end);
 
-void lex(char path[]);
+Tokenlist lex(char path[]);
 
 #endif

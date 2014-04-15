@@ -6,38 +6,41 @@
 #include "Tokenlist.h"
 #include "Buffer.h"
 
-void processToken(Tokenlist *list, char type[], char value[]) {
+void processToken(Tokenlist *list, char type[], char value[], int line, int start, int end) {
 	
 	Token token;
 	// pointers to NULL (avoid segmentation fault)
 	token.type = NULL;
 	token.value = NULL;
 
+	// assign the values
+	token.line = line;
+	token.start = start;
+	token.end = end;
+
 	token.type = type;
-	
 	if(value != NULL) {
 		// malloc the value pointer
 		token.value = malloc(strlen(value) + 1);
 		// copy value
 		strcpy(token.value, value);
 	}
-	
 	insertTokenlist(list, token);
 }
 
-void lex(char path[]) {
+Tokenlist lex(char path[]) {
 
 	FILE* file = NULL;
 	file = fopen(path, "r");
+
+	Tokenlist tokens;
+	initTokenlist(&tokens);
 
 	if(file != NULL) {
 
 		char character;
 		int line = 0, column = 0, start = 0, end = 0;
 		bool buffering = false;
-
-		Tokenlist tokens;
-		initTokenlist(&tokens);
 
 		Buffer buffer;
 		initBuffer(&buffer);
@@ -54,37 +57,37 @@ void lex(char path[]) {
 
 				case '{':
 					if(!buffering) {
-						processToken(&tokens, "LEFT_BRACKET", NULL);
+						processToken(&tokens, "LEFT_BRACKET", NULL, line, column, column);
 						break;
 					}
 
 				case '}':
 					if(!buffering) {
-						processToken(&tokens, "RIGHT_BRACKET", NULL);
+						processToken(&tokens, "RIGHT_BRACKET", NULL, line, column, column);
 						break;
 					}
 
 				case '[':
 					if(!buffering) {
-						processToken(&tokens, "LEFT_SQUARE", NULL);
+						processToken(&tokens, "LEFT_SQUARE", NULL, line, column, column);
 						break;
 					}
 
 				case ']':
 					if(!buffering) {
-						processToken(&tokens, "RIGHT_SQUARE", NULL);
+						processToken(&tokens, "RIGHT_SQUARE", NULL, line, column, column);
 						break;
 					}
 
 				case ':':
 					if(!buffering) {
-						processToken(&tokens, "ASSIGNATION", NULL);
+						processToken(&tokens, "ASSIGNATION", NULL, line, column, column);
 						break;
 					}
 
 				case ',':
 					if(!buffering) {
-						processToken(&tokens, "COMA", NULL);
+						processToken(&tokens, "COMA", NULL, line, column, column);
 						break;
 					}
 
@@ -98,7 +101,7 @@ void lex(char path[]) {
 							value[i+1] = '\0';
 						}
 
-						processToken(&tokens, "VALUE", value);
+						processToken(&tokens, "VALUE", value, line, start, column);
 						emptyBuffer(&buffer);
 
 					} else {
@@ -106,7 +109,7 @@ void lex(char path[]) {
 						start = column + 1;
 						
 					}
-					processToken(&tokens, "QUOTE", NULL);
+					processToken(&tokens, "QUOTE", NULL, line, column, column);
 					break;
 
 				default:
@@ -120,10 +123,12 @@ void lex(char path[]) {
 
 		} while(character != EOF);
 
-		dumpTokenlist(&tokens);
+		return tokens;
 
 	} else {
 		printf("File not found\n");
 	}
+
+	return tokens;
 
 }
