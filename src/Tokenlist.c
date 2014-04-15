@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "Tokenlist.h"
 #include "Token.h"
+#include "Tokenlist.h"
 
 void initTokenlist(Tokenlist *list) {
 	list->used = 0;
