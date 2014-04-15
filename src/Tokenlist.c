@@ -21,6 +21,6 @@ void insertTokenlist(Tokenlist *list, Token token) {
 void dumpTokenlist(Tokenlist *list) {
 	for(int i = 0; i < list->used; i++) {
 		Token *token = &list->elements[i];
-		printf("Token type %s at line %d column %d-%d\n", token->type, token->line, token->start, token->end);
+		printf("%s | %s\n", token->type, token->value);
 	}
 }

@@ -4,6 +4,7 @@
 typedef struct Token {
 
 	char *type;
+	char *value;
 	int line, start, end;
 
 } Token;
