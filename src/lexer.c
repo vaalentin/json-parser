@@ -1,121 +1,156 @@
-/**
- * \file lexer.c
- * \brief lexer implementation
- * \version 0.0.1
- */
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <stdbool.h>
 #include <string.h>
-#include "lexer.h"
+#include "Token.h"
+#include "Tokenlist.h"
 #include "Buffer.h"
 
-void lex(char path[]) {
+void processToken(Tokenlist *list, char type[], char value[], int line, int start, int end) {
+	Token token;
+	// pointers to NULL
+	// (to avoid segmentation faults)
+	token.type = NULL;
+	token.value = NULL;
 
-	printf("reading %s\n", path);
+	// assign the values
+	token.line = line;
+	token.start = start;
+	token.end = end;
+
+	token.type = type;
+	if(value != NULL) {
+		// assign the correct ammount of memory to the element pointer
+		// which is the size of value + 1
+		// then we copy value
+		// (+1 because otherwise there isn't enough space for the ending '\0')
+		token.value = malloc(strlen(value) + 1);
+		strcpy(token.value, value);
+	}
+
+	// insert our newly created Token to the Tokenlist
+	insertTokenlist(list, token);
+}
+
+Tokenlist lex(char path[]) {
 
 	FILE* file = NULL;
 	file = fopen(path, "r");
 
+	// tokens will holds the tokens found
+	// and then be returned
+	Tokenlist tokens;
+	initTokenlist(&tokens);
+
 	if(file != NULL) {
 
-		/**
-		 * During the loop
-		 * currentChar holds the current character
-		 * currentLine holds the current line number
-		 * currentCol holds the current column number
-		 * start tmp value to hold the start of a catcheable sequence
-		 */
-		int currentChar = 0, currentLine = 0, currentCol = 0, start = 0;
-		bool quotationOpen = false;
-		
-		// our buffer
+		// informations we're gonna need during the loop
+		char character;
+		int line = 0, column = 0, start = 0, end = 0;
+		bool buffering = false;
+
+		// buffer will holds the characters that we want to capture
+		// (between " ")
 		Buffer buffer;
-		initBuffer(&buffer, 1);
+		initBuffer(&buffer);
 
 		// loop through each characters
 		do {
 
-			currentChar = fgetc(file);
+			character = fgetc(file);
 
-			/**
-			 * match the current character
-			 * 
-			 * Json reserved characters : { } [ ] " , :
-			 * but only outside of " "
-			 * that's why we use quotationOpen as a switch to know if we should capture them
-			 */
-			if(currentChar == '\n') {
-				currentLine++;
-				currentCol = 0;
-			}
-			else if(currentChar == '{') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("LEFT_BRACKET\n");
-			}
-			else if(currentChar == '}') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("RIGHT_BRACKET\n");
-			}
-			else if(currentChar == '[') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("LEFT_SQUARE\n");
-			}
-			else if(currentChar == ']') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("RIGHT_SQUARE\n");
-			}
-			else if(currentChar == '"') {
-				// start the buffering
-				quotationOpen = !quotationOpen;
-				// we just found a closing "
-				if(!quotationOpen) {
+			// the main logic is here
+			switch(character) {
+				// new line
+				// increase the line count and reset the column
+				case '\n':
+					line++;
+					column = 0;
+					break;
 
-					printf("%d | %d-%d | ", currentLine, start, currentCol - 1);
-					
-					// capture the buffer content
-					// add 1 to have enough space to put '\0'
-					char text[buffer.used + 1];
-					for(int i = 0; i < buffer.used; i++) {
-						text[i] = buffer.array[i];
-						text[i + 1] = '\0';
+				case '{':
+					// process this character only if we're not buffering
+					// otherwise we won't be able to catch
+					// "hello {world}"
+					if(!buffering) {
+						processToken(&tokens, "LEFT_BRACKET", NULL, line, column, column);
+						break;
 					}
-					printf("%s\n", text);
-					// empty the buffer
-					emptyBuffer(&buffer);
 
-				} else {
-					// otherwise, a word to capture started
-					start = currentCol + 1;
-				}
+				case '}':
+					if(!buffering) {
+						processToken(&tokens, "RIGHT_BRACKET", NULL, line, column, column);
+						break;
+					}
 
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("QUOTE\n");
-			}
-			else if(currentChar == ':') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("ASSIGNATION\n");
-			}
-			else if(currentChar == ',') {
-				printf("%d | %d | ", currentLine, currentCol);
-				printf("COMMA\n");
-			}
-			else {
-				// not a reserved character, append it to the buffer
-				if(quotationOpen) {
-					appendBuffer(&buffer, currentChar);
-				}
+				case '[':
+					if(!buffering) {
+						processToken(&tokens, "LEFT_SQUARE", NULL, line, column, column);
+						break;
+					}
+
+				case ']':
+					if(!buffering) {
+						processToken(&tokens, "RIGHT_SQUARE", NULL, line, column, column);
+						break;
+					}
+
+				case ':':
+					if(!buffering) {
+						processToken(&tokens, "ASSIGNATION", NULL, line, column, column);
+						break;
+					}
+
+				case ',':
+					if(!buffering) {
+						processToken(&tokens, "COMA", NULL, line, column, column);
+						break;
+					}
+
+				case '"':
+					buffering = !buffering;
+
+					// if we are ending the buffering
+					if(!buffering) {
+
+						// extract the buffered value
+						char value[buffer.used+1];
+						for(int i = 0; i < buffer.used; i++) {
+							value[i] = buffer.elements[i];
+							value[i+1] = '\0';
+						}
+
+						processToken(&tokens, "VALUE", value, line, start, column);
+
+						// reset the buffer
+						emptyBuffer(&buffer);
+
+					} else {
+						// else, we are starting a new buffering
+						// keep the current column as the starting point
+						start = column + 1;
+					}
+					processToken(&tokens, "QUOTE", NULL, line, column, column);
+					break;
+
+				default:
+					// if a " have been open and not closed yet
+					if(buffering) {
+						insertBuffer(&buffer, character);
+					}
+					break;
 			}
 
-			currentCol++;
-			
-		} while (currentChar != EOF);
+			column++;
 
-		fclose(file);
+		} while(character != EOF);
+
+		return tokens;
 
 	} else {
-		printf("File not found \n");
+		printf("File not found\n");
 	}
+
+	return tokens;
 
 }

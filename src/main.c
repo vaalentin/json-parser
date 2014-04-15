@@ -1,12 +1,13 @@
-/**
- * \file main.c
- * \version 0.0.1
- */
 #include <stdio.h>
 #include <stdlib.h>
 #include "lexer.h"
+#include "Tokenlist.h"
 
 int main(int argc, char *argv[]) {
-	lex("example.json");
+
+	Tokenlist tokens;
+	tokens = lex("example.json");
+	dumpTokenlist(&tokens);
+
 	return 0;
 }
