@@ -8,7 +8,8 @@
 
 void processToken(Tokenlist *list, char type[], char value[], int line, int start, int end) {
 	Token token;
-	// pointers to NULL (avoid segmentation fault)
+	// pointers to NULL
+	// (to avoid segmentation faults)
 	token.type = NULL;
 	token.value = NULL;
 
@@ -19,11 +20,15 @@ void processToken(Tokenlist *list, char type[], char value[], int line, int star
 
 	token.type = type;
 	if(value != NULL) {
-		// malloc the value pointer
+		// assign the correct ammount of memory to the element pointer
+		// which is the size of value + 1
+		// then we copy value
+		// (+1 because otherwise there isn't enough space for the ending '\0')
 		token.value = malloc(strlen(value) + 1);
-		// copy value
 		strcpy(token.value, value);
 	}
+
+	// insert our newly created Token to the Tokenlist
 	insertTokenlist(list, token);
 }
 
@@ -32,29 +37,41 @@ Tokenlist lex(char path[]) {
 	FILE* file = NULL;
 	file = fopen(path, "r");
 
+	// tokens will holds the tokens found
+	// and then be returned
 	Tokenlist tokens;
 	initTokenlist(&tokens);
 
 	if(file != NULL) {
 
+		// informations we're gonna need during the loop
 		char character;
 		int line = 0, column = 0, start = 0, end = 0;
 		bool buffering = false;
 
+		// buffer will holds the characters that we want to capture
+		// (between " ")
 		Buffer buffer;
 		initBuffer(&buffer);
 
+		// loop through each characters
 		do {
 
 			character = fgetc(file);
 
+			// the main logic is here
 			switch(character) {
+				// new line
+				// increase the line count and reset the column
 				case '\n':
 					line++;
 					column = 0;
 					break;
 
 				case '{':
+					// process this character only if we're not buffering
+					// otherwise we won't be able to catch
+					// "hello {world}"
 					if(!buffering) {
 						processToken(&tokens, "LEFT_BRACKET", NULL, line, column, column);
 						break;
@@ -92,8 +109,11 @@ Tokenlist lex(char path[]) {
 
 				case '"':
 					buffering = !buffering;
+
+					// if we are ending the buffering
 					if(!buffering) {
 
+						// extract the buffered value
 						char value[buffer.used+1];
 						for(int i = 0; i < buffer.used; i++) {
 							value[i] = buffer.elements[i];
@@ -101,17 +121,20 @@ Tokenlist lex(char path[]) {
 						}
 
 						processToken(&tokens, "VALUE", value, line, start, column);
+
+						// reset the buffer
 						emptyBuffer(&buffer);
 
 					} else {
-
+						// else, we are starting a new buffering
+						// keep the current column as the starting point
 						start = column + 1;
-						
 					}
 					processToken(&tokens, "QUOTE", NULL, line, column, column);
 					break;
 
 				default:
+					// if a " have been open and not closed yet
 					if(buffering) {
 						insertBuffer(&buffer, character);
 					}
