@@ -7,7 +7,6 @@
 #include "Buffer.h"
 
 void processToken(Tokenlist *list, char type[], char value[], int line, int start, int end) {
-	
 	Token token;
 	// pointers to NULL (avoid segmentation fault)
 	token.type = NULL;

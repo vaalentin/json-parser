@@ -2,10 +2,8 @@
 #define H_BUFFER
 
 typedef struct Buffer {
-
 	char *elements;
 	int used, size;
-
 } Buffer;
 
 void initBuffer(Buffer *buffer);

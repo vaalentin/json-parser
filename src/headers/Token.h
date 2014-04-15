@@ -2,11 +2,8 @@
 #define H_TOKEN
 
 typedef struct Token {
-
-	char *type;
-	char *value;
+	char *type, *value;
 	int line, start, end;
-
 } Token;
 
 #endif

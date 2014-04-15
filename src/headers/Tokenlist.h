@@ -4,10 +4,8 @@
 #define H_TOKENLIST
 
 typedef struct Tokenlist {
-
 	Token *elements;
 	int used, size;
-
 } Tokenlist;
 
 void initTokenlist(Tokenlist *list);
