@@ -4,21 +4,16 @@
 #define H_TOKENLIST
 
 typedef struct Tokenlist {
-	Token *array;
-	size_t size;
-	size_t used;
+
+	Token *elements;
+	int used, size;
+
 } Tokenlist;
 
-void initTokenlist(Tokenlist *list, size_t size);
+void initTokenlist(Tokenlist *list);
 
-void appendTokenlist(Tokenlist *list, Token token);
+void insertTokenlist(Tokenlist *list, Token token);
 
-void emptyTokenlist(Tokenlist *list);
-
-void clearTokenlist(Tokenlist *list);
-
-void printTokenlist(Tokenlist *list);
-
-int getTokenlistSize(Tokenlist *list);
+void dumpTokenlist(Tokenlist *list);
 
 #endif

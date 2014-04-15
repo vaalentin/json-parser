@@ -3,44 +3,27 @@
 #include "Tokenlist.h"
 #include "Token.h"
 
-void initTokenlist(Tokenlist *list, size_t size) {
-	list->array = (Token *)malloc(size * sizeof(Token));
-	list->size = size;
+void initTokenlist(Tokenlist *list) {
 	list->used = 0;
+	list->size = 1;
+	list->elements = (Token *)malloc(1 * sizeof(Token));
 }
 
-void appendTokenlist(Tokenlist *list, Token token) {
+void insertTokenlist(Tokenlist *list, Token token) {
 	if(list->used == list->size) {
 		list->size *= 2;
-
-		int size = list->size * sizeof(Token);
-		printf("----- AUGMENT TOKEN LIST SIZE to %d -----\n", size);
-
-		list->array = (Token *)realloc(list->array, size);
+		// printf("increased size to %d elements (%lu bytes)\n", list->size, list->size * sizeof(Token));
+		list->elements = (Token *)realloc(list->elements, list->size * sizeof(Token));
 	}
-	list->array[list->used++] = token;
+
+	list->elements[list->used] = token;
+
+	list->used++;
 }
 
-void emptyTokenlist(Tokenlist *list) {
-	list->array = (Token *)realloc(list->array, 1 * sizeof(Token));
-	list->used = 0;
-	list->size = 0;
-}
-
-void clearTokenlist(Tokenlist *list) {
-	free(list->array);
-	list->array = NULL;
-	list->used = 0;
-	list->size = 0;
-}
-
-void printTokenlist(Tokenlist *list) {
-	for(int i = 0; i < 2; i++) {
-		printf("%s\n", list->array[i].type);
+void dumpTokenlist(Tokenlist *list) {
+	for(int i = 0; i < list->used; i++) {
+		Token *token = &list->elements[i];
+		printf("Token line: %d type: %s\n", token->line, token->type);
 	}
-}
-
-int getTokenlistSize(Tokenlist *list) {
-	int size = list->used;
-	return size;
 }

@@ -1,11 +1,10 @@
-/**
- * \file lexer.h
- * \brief lexer header
- * \version 0.0.1
- */
+#include "Tokenlist.h"
+
 #ifndef H_LEXER
 #define H_LEXER
 
 void lex(char path[]);
+
+void processToken(Tokenlist *list);
 
 #endif
