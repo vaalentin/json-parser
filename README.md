@@ -4,6 +4,8 @@ A simple json parser written in C
 
 Only the lexer works right now.
 
+![Alt text](./screenshots/lexer.png "Lexer")
+
 ## Compile
 
 Simply execute the makefile by executing `make`, then you can execute the `build` file.

@@ -1,44 +1,30 @@
-/**
- * \file Buffer.c
- * \brief Buffer implementation
- * \version 0.0.1
- */
 #include <stdio.h>
 #include <stdlib.h>
 #include "Buffer.h"
 
-void initBuffer(Buffer *buffer, size_t size) {
-	// by using malloc, we will be able to use realloc
-	buffer->array = (int *)malloc(size * sizeof(char));
-	buffer->size = size;
+void initBuffer(Buffer *buffer) {
 	buffer->used = 0;
+	buffer->size = 1;
+	buffer->elements = (char *)malloc(1 * sizeof(char));
 }
 
-void appendBuffer(Buffer *buffer, char character) {
-	// if we reach the max size, * 2
+void insertBuffer(Buffer *buffer, char character) {
 	if(buffer->used == buffer->size) {
 		buffer->size *= 2;
-		buffer->array = (int *)realloc(buffer->array, buffer->size * sizeof(char));
+		buffer->elements = (char *)realloc(buffer->elements, buffer->size * sizeof(char));
 	}
-	buffer->array[buffer->used++] = character;
+	buffer->elements[buffer->used] = character;
+	buffer->used++;
 }
 
 void emptyBuffer(Buffer *buffer) {
-	// '\0' close the array
-	buffer->array[0] = '\0';
-	buffer->used = 0;
-	buffer->size = 0;
+	initBuffer(buffer);
 }
 
-void clearBuffer(Buffer *buffer) {
-	free(buffer->array);
-	buffer->array = NULL;
-	buffer->used = 0;
-	buffer->size = 0;
-}
-
-void printBuffer(Buffer *buffer) {
+void dumpBuffer(Buffer *buffer) {
+	printf("Buffer ");
 	for(int i = 0; i < buffer->used; i++) {
-		printf("%c", buffer->array[i]);
+		printf("%c", buffer->elements[i]);
 	}
+	printf("\n");
 }
