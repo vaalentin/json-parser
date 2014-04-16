@@ -137,7 +137,7 @@ Tokenlist lex(char path[]) {
 						// keep the current column as the starting point
 						start = column + 1;
 					}
-					processToken(&tokens, "QUOTE", NULL, line, column, column);
+					//processToken(&tokens, "QUOTE", NULL, line, column, column);
 					break;
 
 				default:
@@ -150,7 +150,7 @@ Tokenlist lex(char path[]) {
 						// start buffering and swith captureDigit
 						buffering = !buffering;
 						capturingDigit = !capturingDigit;
-						// capture this (otherwise it will be skipped)
+						// capture this character (otherwise it will be skipped)
 						insertBuffer(&buffer, character);
 					}
 					break;
