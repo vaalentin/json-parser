@@ -1,7 +1,6 @@
 {
-	"name": "Once upon a time",
-	"author": "Henry",
-	"version": "0.0.1",
+	"user": "Pierre",
+	"age": 24,
 	"elements": [
 		{ "name": "cover" },
 		{ "name": "pages" }

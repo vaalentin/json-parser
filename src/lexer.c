@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <ctype.h>
 #include "Token.h"
 #include "Tokenlist.h"
 #include "Buffer.h"
@@ -47,7 +48,7 @@ Tokenlist lex(char path[]) {
 		// informations we're gonna need during the loop
 		char character;
 		int line = 0, column = 0, start = 0, end = 0;
-		bool buffering = false;
+		bool buffering = false, capturingDigit = false;
 
 		// buffer will holds the characters that we want to capture
 		// (between " ")
@@ -58,6 +59,12 @@ Tokenlist lex(char path[]) {
 		do {
 
 			character = fgetc(file);
+
+			// if we have a space, turn off the digit capturing
+			// e.g: 19.29 <= here
+			if(capturingDigit && character == ' ') {
+				capturingDigit = !capturingDigit;
+			}
 
 			// the main logic is here
 			switch(character) {
@@ -130,12 +137,20 @@ Tokenlist lex(char path[]) {
 						// keep the current column as the starting point
 						start = column + 1;
 					}
-					processToken(&tokens, "QUOTE", NULL, line, column, column);
+					//processToken(&tokens, "QUOTE", NULL, line, column, column);
 					break;
 
 				default:
 					// if a " have been open and not closed yet
 					if(buffering) {
+						insertBuffer(&buffer, character);
+					}
+					// else if not buffering yet and we encouter a number
+					else if(isdigit(character)) {
+						// start buffering and swith captureDigit
+						buffering = !buffering;
+						capturingDigit = !capturingDigit;
+						// capture this character (otherwise it will be skipped)
 						insertBuffer(&buffer, character);
 					}
 					break;
