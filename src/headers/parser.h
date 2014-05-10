@@ -3,6 +3,11 @@
 #ifndef H_PARSER
 #define H_PARSER
 
-void parse(Tokenlist *tokens);
+/**
+ * Parse a token stream
+ *
+ * @param tokens a pointer to a Tokenlist
+ */
+void parse(Tokenlist const *tokens);
 
 #endif
