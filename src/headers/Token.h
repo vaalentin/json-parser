@@ -8,8 +8,8 @@
  * @struct Token
  */
 typedef struct Token {
-	char *type, *value;
-	int line, start, end;
+	char *value;
+	int type, line, start, end;
 } Token;
 
 #endif

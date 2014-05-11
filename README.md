@@ -31,6 +31,18 @@ typedef struct Token {
 } Token;
 ```
 
+Tokens
+
+| Id | Type  |
+| -- | ----- |
+| 0  | {     |
+| 1  | }     |
+| 2  | [     |
+| 3  | ]     |
+| 4  | :     |
+| 5  | ,     |
+| 6  | Value |
+
 ### Example
 
 #### Input

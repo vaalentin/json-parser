@@ -13,7 +13,7 @@
  * @param start start column of the token
  * @param end end column of the token (same as start for one character tokens)
  */
-void processToken(Tokenlist *list, char type[], char value[], int line, int start, int end);
+void processToken(Tokenlist *list, int type, char value[], int line, int start, int end);
 
 /**
  * Lex a file

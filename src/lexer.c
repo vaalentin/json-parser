@@ -7,14 +7,14 @@
 #include "Tokenlist.h"
 #include "Buffer.h"
 
-void processToken(Tokenlist *list, char type[], char value[], int line, int start, int end) {
+void processToken(Tokenlist *list, int type, char value[], int line, int start, int end) {
 	Token token;
 	// pointers to NULL
 	// (to avoid segmentation faults)
-	token.type = NULL;
 	token.value = NULL;
 
 	// assign the values
+	token.type = type;
 	token.line = line;
 	token.start = start;
 	token.end = end;
@@ -80,37 +80,37 @@ Tokenlist lex(char path[]) {
 					// otherwise we won't be able to catch
 					// "hello {world}"
 					if(!buffering) {
-						processToken(&tokens, "LEFT_BRACKET", NULL, line, column, column);
+						processToken(&tokens, 0, NULL, line, column, column);
 						break;
 					}
 
 				case '}':
 					if(!buffering) {
-						processToken(&tokens, "RIGHT_BRACKET", NULL, line, column, column);
+						processToken(&tokens, 1, NULL, line, column, column);
 						break;
 					}
 
 				case '[':
 					if(!buffering) {
-						processToken(&tokens, "LEFT_SQUARE", NULL, line, column, column);
+						processToken(&tokens, 2, NULL, line, column, column);
 						break;
 					}
 
 				case ']':
 					if(!buffering) {
-						processToken(&tokens, "RIGHT_SQUARE", NULL, line, column, column);
+						processToken(&tokens, 3, NULL, line, column, column);
 						break;
 					}
 
 				case ':':
 					if(!buffering) {
-						processToken(&tokens, "ASSIGNATION", NULL, line, column, column);
+						processToken(&tokens, 4, NULL, line, column, column);
 						break;
 					}
 
 				case ',':
 					if(!buffering) {
-						processToken(&tokens, "COMA", NULL, line, column, column);
+						processToken(&tokens, 5, NULL, line, column, column);
 						break;
 					}
 
@@ -127,7 +127,7 @@ Tokenlist lex(char path[]) {
 							value[i+1] = '\0';
 						}
 
-						processToken(&tokens, "VALUE", value, line, start, column);
+						processToken(&tokens, 6, value, line, start, column);
 
 						// reset the buffer
 						emptyBuffer(&buffer);
