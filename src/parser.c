@@ -5,12 +5,14 @@
 #include "Token.h"
 #include "Parser.h"
 
+void parse(Tokenlist *tokens) {
 
-void parse(Tokenlist const *tokens) {
+	Token *token;
+	token = nextToken(tokens);
 
-	for(int cursor = 0; cursor < tokens->used - 1; cursor++) {
-		Token *token = &tokens->elements[cursor];
+	while(token->type != NULL) {
 		printf("%s, %s\n", token->type, token->value);
+		token = nextToken(tokens);
 	}
 
 }

@@ -10,7 +10,7 @@
  */
 typedef struct Tokenlist {
 	Token *elements;
-	int used, size;
+	int used, size, current;
 } Tokenlist;
 
 /**
@@ -39,5 +39,13 @@ void insertTokenlist(Tokenlist *list, Token token);
  * @param list pointer to a Tokenlist
  */
 void dumpTokenlist(Tokenlist *list);
+
+/**
+ * Get the next Token
+ *
+ * @param list a pointer to a TokenList
+ * @return Token a pointer to a Token
+ */
+Token *nextToken(Tokenlist *list);
 
 #endif

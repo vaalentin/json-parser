@@ -6,6 +6,7 @@
 void initTokenlist(Tokenlist *list) {
 	list->used = 0; // keep track of the size of elements
 	list->size = 1; // the maximum size of elements
+	list->current = 0; // used for the iterator
 	list->elements = (Token *)malloc(1 * sizeof(Token)); // keep the 1 just to be clear
 }
 
@@ -27,4 +28,10 @@ void dumpTokenlist(Tokenlist *list) {
 		Token *token = &list->elements[i];
 		printf("%s | %s | line %d | col %d-%d\n", token->type, token->value, token->line, token->start, token->end);
 	}
+}
+
+Token *nextToken(Tokenlist *list) {
+	int index = list->current;
+	list->current++;
+	return &list->elements[index];
 }

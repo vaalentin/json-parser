@@ -8,6 +8,6 @@
  *
  * @param tokens a pointer to a Tokenlist
  */
-void parse(Tokenlist const *tokens);
+void parse(Tokenlist *tokens);
 
 #endif
