@@ -4,7 +4,7 @@
 #ifndef H_TIMER
 #define H_TIMER
 
-int elapsedTime(struct timeval *result, struct timeval *start, struct timeval *end);
+void elapsedTime(struct timeval *result, struct timeval *start, struct timeval *end);
 
 void printTime(struct timeval *time);
 

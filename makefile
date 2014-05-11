@@ -2,8 +2,8 @@
 # -c don't link
 # -I header path
 # -o output
-all: src/main.c lexer.o Buffer.o Tokenlist.o Token.o parser.o
-	gcc -I src/headers src/main.c Buffer.o lexer.o Tokenlist.o Token.o parser.o -o build
+all: src/main.c lexer.o Buffer.o Tokenlist.o Token.o parser.o timer.o
+	gcc -I src/headers src/main.c Buffer.o lexer.o Tokenlist.o Token.o parser.o timer.o -o build
 
 lexer.o: src/lexer.c
 	gcc -c src/lexer.c -I src/headers -o lexer.o
@@ -19,6 +19,9 @@ Token.o: src/Token.c
 
 parser.o: src/parser.c
 	gcc -c src/parser.c -I src/headers -o parser.o
+
+timer.o: src/timer.c
+	gcc -c src/timer.c -I src/headers -o timer.o	
 
 # clean all the tmp files
 clean:
