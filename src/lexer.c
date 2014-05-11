@@ -6,6 +6,7 @@
 #include "Token.h"
 #include "Tokenlist.h"
 #include "Buffer.h"
+#include "colors.h"
 
 void processToken(Tokenlist *list, char type[], char value[], int line, int start, int end) {
 	Token token;
@@ -31,6 +32,9 @@ void processToken(Tokenlist *list, char type[], char value[], int line, int star
 
 	// insert our newly created Token to the Tokenlist
 	insertTokenlist(list, token);
+
+	printf("%s%s%s%s\n", "new token ", CYAN, token.type, COLOR_RESET);
+
 }
 
 Tokenlist lex(char path[]) {
@@ -66,45 +70,42 @@ Tokenlist lex(char path[]) {
 				capturingDigit = !capturingDigit;
 			}
 
-			// the main logic is here
 			switch(character) {
 				// new line
-				// increase the line count and reset the column
 				case '\n':
 					line++;
 					column = 0;
 					break;
 
 				case '{':
-					// process this character only if we're not buffering
-					// otherwise we won't be able to catch
-					// "hello {world}"
+					// process only if we're not buffering
+					// e.g: "hello {world}"
 					if(!buffering) {
-						processToken(&tokens, "LEFT_BRACKET", NULL, line, column, column);
+						processToken(&tokens, "L_BRACKET", NULL, line, column, column);
 						break;
 					}
 
 				case '}':
 					if(!buffering) {
-						processToken(&tokens, "RIGHT_BRACKET", NULL, line, column, column);
+						processToken(&tokens, "R_BRACKET", NULL, line, column, column);
 						break;
 					}
 
 				case '[':
 					if(!buffering) {
-						processToken(&tokens, "LEFT_SQUARE", NULL, line, column, column);
+						processToken(&tokens, "L_SQUARE", NULL, line, column, column);
 						break;
 					}
 
 				case ']':
 					if(!buffering) {
-						processToken(&tokens, "RIGHT_SQUARE", NULL, line, column, column);
+						processToken(&tokens, "R_SQUARE", NULL, line, column, column);
 						break;
 					}
 
 				case ':':
 					if(!buffering) {
-						processToken(&tokens, "ASSIGNATION", NULL, line, column, column);
+						processToken(&tokens, "ASSIGN", NULL, line, column, column);
 						break;
 					}
 
@@ -115,9 +116,10 @@ Tokenlist lex(char path[]) {
 					}
 
 				case '"':
+					// toggle state 
 					buffering = !buffering;
 
-					// if we are ending the buffering
+					// we just ended the buffering
 					if(!buffering) {
 
 						// extract the buffered value
@@ -128,24 +130,27 @@ Tokenlist lex(char path[]) {
 						}
 
 						processToken(&tokens, "VALUE", value, line, start, column);
+						processToken(&tokens, "QUOTE", NULL, line, column, column);
 
 						// reset the buffer
 						emptyBuffer(&buffer);
 
 					} else {
-						// else, we are starting a new buffering
+						// starting a new buffer
 						// keep the current column as the starting point
 						start = column + 1;
+						
+						processToken(&tokens, "QUOTE", NULL, line, column, column);
 					}
-					//processToken(&tokens, "QUOTE", NULL, line, column, column);
+
 					break;
 
 				default:
-					// if a " have been open and not closed yet
+					// still buffering
 					if(buffering) {
 						insertBuffer(&buffer, character);
 					}
-					// else if not buffering yet and we encouter a number
+					// not buffering, and we have a number
 					else if(isdigit(character)) {
 						// start buffering and swith captureDigit
 						buffering = !buffering;
@@ -163,7 +168,7 @@ Tokenlist lex(char path[]) {
 		return tokens;
 
 	} else {
-		printf("File not found\n");
+		printf("%s%s%s\n", RED, "File not found", COLOR_RESET);
 	}
 
 	return tokens;
