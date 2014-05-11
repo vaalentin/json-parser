@@ -11,5 +11,5 @@ void elapsedTime(struct timeval *result, struct timeval *start, struct timeval *
 void printTime(struct timeval *time) {
 	char buffer[30];
 	time_t currentTime;
-	printf("%ld.%06dms\n", time->tv_sec, time->tv_usec);
+	printf("%ld.%06dms", time->tv_sec, time->tv_usec);
 }
